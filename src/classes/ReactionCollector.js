@@ -49,7 +49,6 @@ class ReactionCollector extends Base {
         if (this.collected.has(ReactionCollector.key(emoji)) && this.users.has(userID)) {
             this.emit("remove", emoji, userID);
         }
-        return reaction.count ? null : ReactionCollector.key(reaction);
     }
 
     empty() {
