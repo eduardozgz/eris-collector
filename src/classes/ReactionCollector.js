@@ -5,7 +5,7 @@ class ReactionCollector extends Base {
     constructor(client, message, filter, options = {}) {
         super(filter, options);
         this.message = message;
-        this.users = new Map();
+        this.users = new Set();
         this.total = 0;
         this.empty = this.empty.bind(this);
         this._handleChannelDeletion = this._handleChannelDeletion.bind(this);
@@ -28,18 +28,18 @@ class ReactionCollector extends Base {
             client.removeListener("guildDelete", this._handleGuildDeletion);
         });
 
-        this.on("collect", (reaction, user) => {
+        this.on("collect", (message, emoji, userID) => {
             this.total++;
-            this.users.set(user.id, user);
+            this.users.add(userID);
         });
 
-        this.on("remove", (reaction, user) => {
+        this.on("remove", (message, emoji, userID) => {
             this.total--;
-            if (!this.collected.some(r => r.users.cache.has(user.id))) this.users.delete(user.id);
+            if (this.users.has(userID)) this.users.delete(userID);
         });
     }
 
-    collect(message, emoji) {
+    collect(message, emoji, userID) {
         if (message.id !== this.message.id) return null;
         return ReactionCollector.key(emoji);
     }
@@ -49,6 +49,7 @@ class ReactionCollector extends Base {
         if (this.collected.has(ReactionCollector.key(emoji)) && this.users.has(userID)) {
             this.emit("remove", emoji, userID);
         }
+        return ReactionCollector.key(emoji);
     }
 
     empty() {
