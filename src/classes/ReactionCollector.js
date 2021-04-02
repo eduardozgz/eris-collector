@@ -12,7 +12,11 @@ class ReactionCollector extends Base {
         this._handleGuildDeletion = this._handleGuildDeletion.bind(this);
         this._handleMessageDeletion = this._handleMessageDeletion.bind(this);
 
-        client.on("messageReactionAdd", this.handleCollect);
+        // fix to support eris 0.14 since it will send a member object insted of user snowflake
+        // https://abal.moe/Eris/docs/Client#event-messageReactionAdd
+        const handleCollect = (message, emoji, reactor) => this.handleCollect(message, emoji, reactor.id);
+
+        client.on("messageReactionAdd", handleCollect);
         client.on("messageReactionRemove", this.handleDispose);
         client.on("messageReactionRemoveAll", this.empty);
         client.on("messageDelete", this._handleMessageDeletion);
@@ -20,7 +24,7 @@ class ReactionCollector extends Base {
         client.on("guildDelete", this._handleGuildDeletion);
 
         this.once("end", () => {
-            client.removeListener("messageReactionAdd", this.handleCollect);
+            client.removeListener("messageReactionAdd", handleCollect);
             client.removeListener("messageReactionRemove", this.handleDispose);
             client.removeListener("messageReactionRemoveAll", this.empty);
             client.removeListener("messageDelete", this._handleMessageDeletion);
