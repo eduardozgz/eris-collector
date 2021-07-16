@@ -32,8 +32,8 @@
   "scripts": {
     "test": "node example.js"
   },
-  "version": "1.0.3",
+  "version": "1.0.4",
   "dependencies": {
-    "eris": "^0.14.0"
+    "eris": "^0.15.1"
   }
 }
